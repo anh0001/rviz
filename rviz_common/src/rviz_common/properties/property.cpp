@@ -39,6 +39,7 @@
 #include <QLineEdit>  // NOLINT: cpplint is unable to handle the include order here
 #include <QSpinBox>  // NOLINT: cpplint is unable to handle the include order here
 #include <QString>  // NOLINT: cpplint is unable to handle the include order here
+#include <QPointer>  // NOLINT: cpplint is unable to handle the include order here
 #include <QTimer>  // NOLINT: cpplint is unable to handle the include order here
 
 #include "rviz_common/properties/float_edit.hpp"
@@ -386,11 +387,14 @@ void Property::setModel(PropertyTreeModel * model)
 {
   model_ = model;
   if (model_ && hidden_) {
-    // process propertyHiddenChanged after insertion into model has finishedAdd commentMore actions
+    // process propertyHiddenChanged after insertion into model has finished
+    // Use QPointer to guard against this Property being destroyed before the timer fires
+    QPointer<Property> safe_this(this);
+    QPointer<PropertyTreeModel> safe_model(model_);
     QTimer::singleShot(
-      0, model_, [this]() {
-        if (model_) {
-          model_->emitPropertyHiddenChanged(this);
+      0, model_, [safe_this, safe_model]() {
+        if (safe_this && safe_model) {
+          safe_model->emitPropertyHiddenChanged(safe_this);
         }
       });
   }

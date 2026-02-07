@@ -117,7 +117,7 @@ void PropertyTreeWidget::setModel(PropertyTreeModel * model)
 void PropertyTreeWidget::propertyHiddenChanged(const Property * property)
 {
   if (model_) {
-    if (property->parent() != nullptr) {
+    if (property->getParent() != nullptr) {
       const auto & parent_index = model_->parentIndex(property);
       if (parent_index.isValid()) {
         setRowHidden(property->rowNumberInParent(), parent_index, property->getHidden());
